@@ -7,3 +7,5 @@ Personal x86_64 kernel that's built with rust.
 could roll back nightly version to `2022-10-14`. After installing nightly, to use nightly compiler in the
 current Cargo directory run `rustup override set nightly`.
 - Need to use install core rust source code, `rustup component add rust-src`.
+- To run bootloader, need to install bootimage via `cargo install bootimage`, then to run bootloader requires
+`rustup component add llvm-tools-preview`.
