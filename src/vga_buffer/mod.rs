@@ -3,8 +3,10 @@ use lazy_static::lazy_static;
 use volatile::Volatile;
 use core::fmt;
 
+mod test;
 mod write_wrapper;
 use write_wrapper::Writer;
+
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
