@@ -1,3 +1,4 @@
+#![feature(abi_x86_interrupt)]
 #![cfg_attr(test, no_main)]
 #![reexport_test_harness_main = "test_main"]
 #![feature(custom_test_frameworks)]
@@ -9,6 +10,7 @@ use core::panic::PanicInfo;
 
 pub mod vga_buffer;
 pub mod serial;
+pub mod interrupts;
 
 #[derive(Clone, Copy,Debug,PartialEq, Eq)]
 #[repr(u32)]
