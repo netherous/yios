@@ -44,6 +44,7 @@ pub fn test_panic_handler(_info: &PanicInfo){
 #[cfg(test)]
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
+    init();
     test_main();
     loop {}
 }
@@ -71,4 +72,8 @@ impl <T: Fn()> Testable for T{
         self();
         serial_println!("[passed]")
     }
+}
+
+pub fn init(){
+    interrupts::init_idt();
 }

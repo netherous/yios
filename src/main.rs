@@ -23,6 +23,11 @@ fn panic(_info: &PanicInfo) -> !{
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
 
+    println!("TEMOC{}", "!");
+
+    yios::init();
+    x86_64::instructions::interrupts::int3();
+
     #[cfg(test)]  
     test_main();
 
