@@ -11,6 +11,7 @@ use core::panic::PanicInfo;
 pub mod vga_buffer;
 pub mod serial;
 pub mod interrupts;
+pub mod gdt;
 
 #[derive(Clone, Copy,Debug,PartialEq, Eq)]
 #[repr(u32)]
@@ -34,7 +35,7 @@ fn panic(_info: &PanicInfo)->!{
     loop{}
 }
 
-pub fn test_panic_handler(_info: &PanicInfo){
+pub fn test_panic_handler(_info: &PanicInfo)-> !{
     serial_println!("[fail]\n");
     serial_println!("Panic!: {}\n", _info);
     exit_qemu(QemuExitCode::Success);
@@ -76,4 +77,5 @@ impl <T: Fn()> Testable for T{
 
 pub fn init(){
     interrupts::init_idt();
+    gdt::init();
 }

@@ -26,7 +26,14 @@ pub extern "C" fn _start() -> ! {
     println!("TEMOC{}", "!");
 
     yios::init();
-    x86_64::instructions::interrupts::int3();
+    // x86_64::instructions::interrupts::int3();
+    //
+    // unsafe{
+    //     *(0xdeadbeef as *mut usize) = 42;
+    // };
+    fn stack_overflow () {stack_overflow();}
+
+    stack_overflow();
 
     #[cfg(test)]  
     test_main();
