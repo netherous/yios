@@ -15,6 +15,8 @@ lazy_static!{
     };
 }
 
+//exception vector maps from 0x00 to 0x1E which is 30
+//
 pub fn init_idt(){
     IDT.load();
 }
