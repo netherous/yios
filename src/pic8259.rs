@@ -15,7 +15,7 @@ struct Pic{
 }
 
 impl Pic{
-    pub fn new(vec_offset: u8, cmd: u8, dt: u8)->Pic{
+    const unsafe fn new(vec_offset: u8, cmd: u8, dt: u8)->Pic{
         Pic{
             vec_offset,
             command: Port::new(cmd as u16),
@@ -23,13 +23,16 @@ impl Pic{
         }
     }
     //read mask from data port
-    pub unsafe fn read_mask(&mut self)-> u8{
+    unsafe fn read_mask(&mut self)-> u8{
         self.data.read()
     }
     //set_mask in data port
-    pub unsafe fn set_mask(&mut self, irqline:u8){
+    unsafe fn set_mask(&mut self, irqline:u8){
         let value = self.read_mask() & !(1<<irqline);
         self.data.write(value);
+    }
+    unsafe fn end_of_interrupt(&mut self){
+        self.command.write(PIC_EOI);
     }
 }
 
@@ -38,7 +41,7 @@ pub struct ATPic{
 }
 
 impl ATPic{
-    pub fn new(offset1:u8 , offset2:u8)-> ATPic{
+    pub const unsafe fn new(offset1:u8 , offset2:u8)-> ATPic{
         ATPic { 
             arr_pic: [
                 Pic::new(offset1, PIC1, PIC1+1),
@@ -48,17 +51,30 @@ impl ATPic{
     }
     //initiallized both pic  
     pub unsafe fn initialize(&mut self){
+        //IO wait setup
+        let mut waitport: Port<u8> = Port::new(0x80);
+        let mut wait = || waitport.write(0);
         let a1 = self.arr_pic[0].read_mask();
         let a2 = self.arr_pic[1].read_mask();
         self.arr_pic[0].command.write(PIDC_INIT);
+        wait();
         self.arr_pic[1].command.write(PIDC_INIT);
+        wait();
+
         self.arr_pic[0].data.write(self.arr_pic[0].vec_offset);
+        wait();
         self.arr_pic[1].data.write(self.arr_pic[1].vec_offset);
+        wait();
+
         self.arr_pic[0].data.write(4);
+        wait();
         self.arr_pic[1].data.write(2);
+        wait();
 
         self.arr_pic[0].data.write(ICW4_8086);
+        wait();
         self.arr_pic[1].data.write(ICW4_8086);
+        wait();
 
         self.arr_pic[0].data.write(a1);
         self.arr_pic[1].data.write(a2);
@@ -66,7 +82,7 @@ impl ATPic{
     //set mask based on irq, but Will need to change later
     pub unsafe fn irq_set_mask(&mut self,mut irqline: u8){
         let ind;
-        if irqline < 8{
+        if irqline < self.arr_pic[1].vec_offset{
             ind = 0; 
         }else{
             ind = 1;
@@ -76,5 +92,16 @@ impl ATPic{
     }
     pub unsafe fn handle_interrupt(){
         todo!();
+    }
+    //handle when end of interrupt in send to the PIC, this funtionis called by handler after 
+    //handling the interrupts
+    pub unsafe fn handle_eoi(&mut self, irqline: u8){
+        let ind;
+        if irqline < self.arr_pic[1].vec_offset{
+            ind = 0; 
+        }else{
+            ind = 1;
+        }
+        self.arr_pic[ind].end_of_interrupt();
     }
 }
