@@ -5,7 +5,7 @@
 #![no_std]
 
 use core::panic::PanicInfo;
-use yios::println;
+use yios::*;
 
 #[cfg(not(test))]
 #[panic_handler]
@@ -17,7 +17,7 @@ fn panic(_info: &PanicInfo) -> !{
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> !{
     yios::test_panic_handler(_info);
-    loop{}
+    hlt_loop();
 }
 
 #[no_mangle]
@@ -41,8 +41,7 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     println!("Testing println function with {}", 9.5);
-    panic!("this is a panic message");
-
-    loop {}
+    // panic!("this is a panic message");
+    hlt_loop();
 }
 

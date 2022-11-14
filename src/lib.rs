@@ -33,14 +33,13 @@ pub fn exit_qemu(exit_code: QemuExitCode){
 #[cfg(test)]
 fn panic(_info: &PanicInfo)->!{
     test_panic_handler(_info);
-    loop{}
 }
 
 pub fn test_panic_handler(_info: &PanicInfo)-> !{
     serial_println!("[fail]\n");
     serial_println!("Panic!: {}\n", _info);
     exit_qemu(QemuExitCode::Success);
-    loop{}
+    hlt_loop();
 }
 
 #[cfg(test)]
@@ -48,7 +47,7 @@ pub fn test_panic_handler(_info: &PanicInfo)-> !{
 pub extern "C" fn _start() -> ! {
     init();
     test_main();
-    loop {}
+    hlt_loop();
 }
 
 // &[] is a slice, which is a fat pointer to an continuous segment of memory, 
@@ -83,4 +82,10 @@ pub fn init(){
         interrupts::PICS.lock().initialize();
     }
     x86_64::instructions::interrupts::enable();
+}
+
+pub fn hlt_loop()->!{
+    loop{
+        x86_64::instructions::hlt();
+    }
 }

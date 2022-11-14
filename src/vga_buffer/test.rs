@@ -9,10 +9,15 @@ fn test_println_amount(){
 
 #[test_case]
 fn test_println_output(){
+    use x86_64::instructions::interrupts;
+    use core::fmt::Write;
     let s = "test_println_output string";
-    println!("{}", s);
-    for (i,b) in s.chars().enumerate(){
-       let here = WRITER.lock().buffer.chars[BUFFER_HEIGHT-2][i].read(); 
-       assert_eq!(b, char::from(here.ascii_character));
-    }
+    interrupts::without_interrupts(||{
+        let mut w = WRITER.lock();
+        writeln!(w, "\n{}", s).expect("writeln failed");
+        for (i,b) in s.chars().enumerate(){
+            let here =w.buffer.chars[BUFFER_HEIGHT-2][i].read(); 
+            assert_eq!(b, char::from(here.ascii_character));
+        }
+    });
 }
