@@ -4,6 +4,7 @@ use crate::{println, gdt};
 use spin;
 use crate::pic8259::ATPic;
 
+
 pub const PIC1_OFFSET: u8 = 32;
 pub const PIC2_OFFSET: u8 = 40;
 
@@ -11,6 +12,7 @@ pub const PIC2_OFFSET: u8 = 40;
 #[repr(u8)]
 pub enum InterruptIndex{
     Timer = PIC1_OFFSET,
+    Keyboard,
 }
 
 impl InterruptIndex{
@@ -36,6 +38,7 @@ lazy_static!{
                 .set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX);
         }
         idt[InterruptIndex::Timer.usize()].set_handler_fn(timer_handler);
+        idt[InterruptIndex::Keyboard.usize()].set_handler_fn(keyboard_handler);
         idt
     };
 }
@@ -58,6 +61,20 @@ extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame)
     print!(".");
     unsafe{
        PICS.lock().handle_eoi(InterruptIndex::Timer.u8());
+    }
+}
+
+extern "x86-interrupt" fn keyboard_handler(_stack_frame: InterruptStackFrame)
+{
+    // println!("timer_handler\n{:#?}", stack_frame);
+    use crate::print;
+    use x86_64::instructions::port::Port;
+    const PS2_IO_PORT: u16 = 0x60;
+    let mut port: Port<u8>= Port::new(PS2_IO_PORT);
+    let scancode: u8 = unsafe{port.read()};
+    print!("{}",scancode);
+    unsafe{
+       PICS.lock().handle_eoi(InterruptIndex::Keyboard.u8());
     }
 }
 
