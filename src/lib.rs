@@ -13,6 +13,7 @@ pub mod serial;
 pub mod interrupts;
 pub mod gdt;
 pub mod pic8259;
+pub mod keyboard_driver;
 
 #[derive(Clone, Copy,Debug,PartialEq, Eq)]
 #[repr(u32)]
