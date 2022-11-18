@@ -2,7 +2,7 @@
 pub struct ScancodeSet1;
 use super::KeyCode;
 impl ScancodeSet1{
-    pub fn map_keycodee(&self, code: u8) -> KeyCode {
+    pub fn map_keycode(&self, code: u8) -> KeyCode {
         match code {
             0x01 => KeyCode::Escape,             
             0x02 => KeyCode::Key1,               

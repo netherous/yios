@@ -79,8 +79,13 @@ extern "x86-interrupt" fn keyboard_handler(_stack_frame: InterruptStackFrame)
     let mut port: Port<u8>= Port::new(PS2_IO_PORT);
     let scancode: u8 = unsafe{port.read()};
     match keyboard.read_byte(scancode) {
-        DecodeKey::Rawcode(code) => print!("{:?}", scancode),
-        DecodeKey::Ascii(character)=> print!("{}", character),
+        DecodeKey::Rawcode(code) => {
+            print!("{:?}",code);
+        },
+        DecodeKey::Ascii(character)=> {
+            print!("{}", character);
+            // println!("{:#x}", scancode);
+        },
     }
 
     unsafe{

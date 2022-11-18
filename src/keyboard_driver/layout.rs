@@ -2,7 +2,8 @@ pub struct Us104;
 use super::{KeyCode,DecodeKey};
 
 impl Us104{
-    pub fn map_to_decode_key(keyCode: KeyCode)-> DecodeKey{
+    pub fn map_to_decode_key(&self, keyCode: KeyCode)-> DecodeKey{
+        use crate::print;
         let cc : u8 = keyCode as u8;      
         let mut i:u8 = 0;
         //numbers

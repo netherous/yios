@@ -40,8 +40,8 @@ impl Keyboard{
         if code > 0x58{
             return DecodeKey::Rawcode(code);
         }
-        let kc = self.sc_set.map_keycodee(code);
-        Us104::map_to_decode_key(kc)
+        let kc = self.sc_set.map_keycode(code);
+        self.lay.map_to_decode_key(kc)
     }
 }
 
@@ -104,9 +104,9 @@ pub enum KeyCode{
     Key5 = 42,
     Key6 = 43,
     Key7 = 44,
-    Key8 = 46,
-    Key9 = 47,
-    Key0 = 48,
+    Key8 = 45,
+    Key9 = 46,
+    Key0 = 47,
     Menus = 49,
     Minus = 50,
     Numpad0 = 51,
@@ -149,24 +149,24 @@ pub enum KeyCode{
     F = 92,
     G = 93,
     H = 94,
-    I = 96,
-    J = 97,
-    K = 98,
-    L = 99,
-    M = 100,
-    N = 101,
-    O = 102,
-    P = 103,
-    Q = 104,
-    R = 106,
-    S = 107,
-    T = 108,
-    U = 109,
-    V = 110,
-    W = 111,
-    X = 112,
-    Y = 113,
-    Z = 114,
+    I = 95,
+    J = 96,
+    K = 97,
+    L = 98,
+    M = 99,
+    N = 100,
+    O = 101,
+    P = 102,
+    Q = 103,
+    R = 104,
+    S = 105,
+    T = 106,
+    U = 107,
+    V = 108,
+    W = 109,
+    X = 110,
+    Y = 111,
+    Z = 112,
     HashTilde = 115,
     PrevTrack = 116,
     NextTrack = 117,
