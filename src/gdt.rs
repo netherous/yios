@@ -3,7 +3,7 @@ use x86_64::{
     structures::{
         tss::TaskStateSegment,
         gdt::{SegmentSelector,GlobalDescriptorTable,Descriptor}
-    }, instructions::segmentation
+    }
 };
 use lazy_static::lazy_static;
 

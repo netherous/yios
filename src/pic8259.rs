@@ -90,9 +90,6 @@ impl ATPic{
         }
         self.arr_pic[ind].set_mask(irqline);
     }
-    pub unsafe fn handle_interrupt(){
-        todo!();
-    }
     //handle when end of interrupt in send to the PIC, this funtionis called by handler after 
     //handling the interrupts
     pub unsafe fn handle_eoi(&mut self, irqline: u8){

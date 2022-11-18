@@ -11,13 +11,13 @@ use yios::*;
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> !{
     println!("{}",_info);
-    loop{}
+    hlt_loop();
 }
+
 #[cfg(test)]
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> !{
     yios::test_panic_handler(_info);
-    hlt_loop();
 }
 
 #[no_mangle]
@@ -33,9 +33,6 @@ pub extern "C" fn _start() -> ! {
     //     *(0xdeadbeef as *mut usize) = 42;
     // };
     
-    fn stack_overflow () {stack_overflow();}
-
-    // stack_overflow();
 
     #[cfg(test)]  
     test_main();

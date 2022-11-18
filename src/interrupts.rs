@@ -66,13 +66,26 @@ extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame)
 
 extern "x86-interrupt" fn keyboard_handler(_stack_frame: InterruptStackFrame)
 {
-    // println!("timer_handler\n{:#?}", stack_frame);
     use crate::print;
     use x86_64::instructions::port::Port;
     const PS2_IO_PORT: u16 = 0x60;
     let mut port: Port<u8>= Port::new(PS2_IO_PORT);
     let scancode: u8 = unsafe{port.read()};
-    print!("{}",scancode);
+    let key  = match scancode{
+        0x02 => Some('1'),
+        0x03 => Some('2'),
+        0x04 => Some('3'),
+        0x05 => Some('4'),
+        0x06 => Some('5'),
+        0x07 => Some('6'),
+        0x08 => Some('7'),
+        0x09 => Some('8'),
+        0x0a => Some('9'),
+        0x0b => Some('0'),
+        _ => None    
+    };
+    print!("{:#x}", scancode);
+    print!("{}_",key.unwrap());
     unsafe{
        PICS.lock().handle_eoi(InterruptIndex::Keyboard.u8());
     }
