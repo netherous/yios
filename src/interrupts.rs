@@ -67,25 +67,26 @@ extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame)
 extern "x86-interrupt" fn keyboard_handler(_stack_frame: InterruptStackFrame)
 {
     use crate::print;
+    use pc_keyboard::*;
     use x86_64::instructions::port::Port;
     use spin::Mutex;
-    use crate::keyboard_driver::{Keyboard,DecodeKey};
+    
     lazy_static!{
-        static ref KEYBOARD: Mutex<Keyboard> = 
-            Mutex::new(Keyboard::new());
+        static ref KEYBOARD: Mutex<Keyboard<layouts::Us104Key, ScancodeSet1>> =
+            Mutex::new(Keyboard::new(layouts::Us104Key, ScancodeSet1, HandleControl::Ignore));
     }
     let mut keyboard = KEYBOARD.lock();
     const PS2_IO_PORT: u16 = 0x60;
     let mut port: Port<u8>= Port::new(PS2_IO_PORT);
     let scancode: u8 = unsafe{port.read()};
-    match keyboard.read_byte(scancode) {
-        DecodeKey::Rawcode(code) => {
-            print!("{:?}",code);
-        },
-        DecodeKey::Ascii(character)=> {
-            print!("{}", character);
-            // println!("{:#x}", scancode);
-        },
+
+    if let Ok(Some(key_event)) = keyboard.add_byte(scancode){
+        if let Some(key) = keyboard.process_keyevent(key_event){
+            match key{
+                DecodedKey::Unicode(character) => print!("{}",character),
+                DecodedKey::RawKey(key) => print!("{:?}", key),
+            }
+        }
     }
 
     unsafe{
