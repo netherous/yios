@@ -1,4 +1,4 @@
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 use lazy_static::lazy_static;
 use crate::{println, gdt};
 use spin;
@@ -39,6 +39,7 @@ lazy_static!{
         }
         idt[InterruptIndex::Timer.usize()].set_handler_fn(timer_handler);
         idt[InterruptIndex::Keyboard.usize()].set_handler_fn(keyboard_handler);
+        idt.page_fault.set_handler_fn(page_fault_handler);
         idt
     };
 }
@@ -47,6 +48,20 @@ lazy_static!{
 //
 pub fn init_idt(){
     IDT.load();
+}
+
+extern "x86-interrupt" fn page_fault_handler(
+    stack_frame: InterruptStackFrame,
+    error_code: PageFaultErrorCode,
+){
+    use x86_64::registers::control::Cr2;
+    use crate::hlt_loop;
+    
+    println!("EXCEPTION: PAGE FAULT");
+    println!("Access Address: {:?}",Cr2::read());
+    println!("error Code: {:?}", error_code);
+    println!("{:#?}", stack_frame);
+    hlt_loop();
 }
 
 extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame)

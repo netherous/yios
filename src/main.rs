@@ -27,11 +27,14 @@ pub extern "C" fn _start() -> ! {
 
     yios::init();
 
-    // x86_64::instructions::interrupts::int3();
-    //
-    // unsafe{
-    //     *(0xdeadbeef as *mut usize) = 42;
-    // };
+    use x86_64::registers::control::Cr3;
+    
+    let (level_4_page_table_frame, cr3_flag) = Cr3::read();
+    println!("Level 4 page table at: {:?}", level_4_page_table_frame.start_address());
+    
+     // unsafe{
+     //     *(0xdeadbeef as *mut usize) = 42;
+     // };
     
 
     #[cfg(test)]  
