@@ -5,6 +5,7 @@
 #![no_std]
 
 use core::panic::PanicInfo;
+use x86_64::structures::paging::Translate;
 use yios::*;
 use bootloader::{BootInfo, entry_point};
 
@@ -30,10 +31,11 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     yios::init();
 
     use x86_64::VirtAddr;
-    use yios::memory::{translate_addr,active_level_4_table};
+    use yios::memory;
     use x86_64::structures::paging::PageTable;
     
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
+    let mapper = unsafe {memory::init(phys_mem_offset)};
     let addresses = [
         0xb8000,
         0x201008,
@@ -43,7 +45,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     for &address in &addresses{
         let virt = VirtAddr::new(address);
-        let phys = unsafe {translate_addr(virt,phys_mem_offset)};
+        let phys = mapper.translate_addr(virt);
         println!("{:?}-> {:?}", virt, phys);
     }
 
