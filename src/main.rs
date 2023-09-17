@@ -4,38 +4,36 @@
 #![no_main]
 #![no_std]
 
+use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
 use x86_64::structures::paging::Translate;
 use yios::*;
-use bootloader::{BootInfo, entry_point};
 
 #[cfg(not(test))]
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> !{
-    println!("{}",_info);
+fn panic(_info: &PanicInfo) -> ! {
+    println!("{}", _info);
     hlt_loop();
 }
 
 #[cfg(test)]
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> !{
+fn panic(_info: &PanicInfo) -> ! {
     yios::test_panic_handler(_info);
 }
 
 entry_point!(kernel_main);
 
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
-
     println!("TEMOC{}", "! Loves the world, and Lets go !");
 
     yios::init();
 
-    use x86_64::VirtAddr;
-    use yios::memory;
     use x86_64::structures::paging::PageTable;
-    
+    use x86_64::VirtAddr;
+
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
-    let mapper = unsafe {memory::init(phys_mem_offset)};
+    let mapper = unsafe { memory::init(phys_mem_offset) };
     let addresses = [
         0xb8000,
         0x201008,
@@ -43,7 +41,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
         boot_info.physical_memory_offset,
     ];
 
-    for &address in &addresses{
+    for &address in &addresses {
         let virt = VirtAddr::new(address);
         let phys = mapper.translate_addr(virt);
         println!("{:?}-> {:?}", virt, phys);
@@ -66,11 +64,10 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     //         }
     //     }
     // }
-    #[cfg(test)]  
+    #[cfg(test)]
     test_main();
 
     println!("Testing println function with {}", 9.5);
     // panic!("this is a panic message");
     hlt_loop();
 }
-

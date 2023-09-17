@@ -1,11 +1,11 @@
 use self::scancode_set::ScancodeSet1;
 
 ///General design pattern
-///the keyboard is assume to use scancode set 1, and US qwert 104 english 
+///the keyboard is assume to use scancode set 1, and US qwert 104 english
 ///keyboard layout.
 ///
 ///key_event is generated from scancode input which contains the status
-///of the key (pressed or released) and the key 
+///of the key (pressed or released) and the key
 ///
 ///Usage pattern
 ///takes in scancode from pic, then generate key_event
@@ -13,31 +13,32 @@ use self::scancode_set::ScancodeSet1;
 ///if the key is pressed or released, and by generating key_event,
 ///key_event contains key state and scancode
 ///
-///Decode/Mapping of key_event, each scancode will be mapped to a 
-///key_code, then keycode will be decoded into possible ascii or rawcode 
+///Decode/Mapping of key_event, each scancode will be mapped to a
+///key_code, then keycode will be decoded into possible ascii or rawcode
 ///characters.
-
-//layout mod to represent US qwert 104 english keyboard 
+//layout mod to represent US qwert 104 english keyboard
 pub mod layout;
 use layout::Us104;
 
 //scancode set mod to represent the scancode set 1
 pub mod scancode_set;
 
-
-//Keyboard struct that contains all informations 
-pub struct Keyboard{
+//Keyboard struct that contains all informations
+pub struct Keyboard {
     lay: Us104,
     sc_set: ScancodeSet1,
 }
 
-impl Keyboard{
-    pub fn new()->Keyboard{
-        Keyboard { lay: Us104{}, sc_set: ScancodeSet1{} }
+impl Keyboard {
+    pub fn new() -> Keyboard {
+        Keyboard {
+            lay: Us104 {},
+            sc_set: ScancodeSet1 {},
+        }
     }
 
-    pub fn read_byte(&self, code : u8)->DecodeKey{
-        if code > 0x58{
+    pub fn read_byte(&self, code: u8) -> DecodeKey {
+        if code > 0x58 {
             return DecodeKey::Rawcode(code);
         }
         let kc = self.sc_set.map_keycode(code);
@@ -46,21 +47,20 @@ impl Keyboard{
 }
 
 //Keyboard errors that need be considered
-pub enum Error{
+pub enum Error {
     UnknownKeyCode,
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
-pub enum DecodeKey{
+pub enum DecodeKey {
     Ascii(char),
     Rawcode(u8),
-} 
-
+}
 
 //Keycodes that is generated from the keyboard
 #[derive(Debug, PartialEq, Eq, Copy, Clone, PartialOrd, Ord)]
 #[repr(u8)]
-pub enum KeyCode{
+pub enum KeyCode {
     AltLeft = 0,
     AltRight = 1,
     ArrowDown = 2,
@@ -184,17 +184,16 @@ pub enum KeyCode{
     Error,
 }
 
-#[derive(Debug,PartialEq, Eq,Clone, Copy)]
-pub enum KeyState{
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum KeyState {
     Pressed,
     Released,
 }
 
-
-pub struct KeyEvent{}
+pub struct KeyEvent {}
 
 //implement for future purpose
-pub struct Modifiers{}
+pub struct Modifiers {}
 
 //implement for future purose, to enact sign INT
-pub enum CtrlHandle{}
+pub enum CtrlHandle {}
